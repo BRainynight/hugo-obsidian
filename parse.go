@@ -6,6 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"strings"
+	"path/filepath"
 )
 
 // parse single file for links
@@ -36,12 +37,14 @@ func parse(dir, pathPrefix string) []Link {
 
 		target = processTarget(target)
 		source := processSource(trim(dir, pathPrefix, ".md"))
+		abs_target_path := filepath.Join(source,"..",target)
+		abs_target_path = filepath.ToSlash(abs_target_path)
 
 		// fmt.Printf("  '%s' => %s\n", source, target)
 		if !strings.HasPrefix(text, "^"){
 			links = append(links, Link{
 				Source: source,
-				Target: target,
+				Target: abs_target_path, // target
 				Text:   text,
 			})
 			n++
