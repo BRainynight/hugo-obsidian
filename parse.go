@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"path/filepath"
+	"net/url"
 )
 
 // parse single file for links
@@ -37,8 +38,15 @@ func parse(dir, pathPrefix string) []Link {
 
 		target = processTarget(target)
 		source := processSource(trim(dir, pathPrefix, ".md"))
-		abs_target_path := filepath.Join(source,"..",target)
-		abs_target_path = filepath.ToSlash(abs_target_path)
+
+		abs_target_path := target
+		u, err := url.ParseRequestURI(abs_target_path)
+		if err != nil || u.Scheme == "" || u.Host == "" {
+			abs_target_path = filepath.Join(source,"..",target)
+			abs_target_path = filepath.ToSlash(abs_target_path)
+		} else {
+			abs_target_path = target
+		}
 
 		// fmt.Printf("  '%s' => %s\n", source, target)
 		if !strings.HasPrefix(text, "^"){
